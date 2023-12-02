@@ -31,6 +31,11 @@ public class ATM implements MoneyMovement {
         return customers;
     }
 
+    /* Description of deposit/withdrawal:
+       newBalance is given the customer's balance
+       then the an amount is added or subtracted from it
+       The customer's balance is then set to the amount found in newBalance*/
+    
     public void deposit(String bankNumber, String pin, double depositMoney) {
         newBalance = customers.get(s.verificationOfCustomer(bankNumber)).getAccount().getCurrentBalance();
         newBalance += depositMoney;
@@ -38,7 +43,12 @@ public class ATM implements MoneyMovement {
     }
 
     public void withdraw(String bankNumber, String pin, double withdrawel) {
+        
         newBalance = customers.get(s.verificationOfCustomer(bankNumber)).getAccount().getCurrentBalance();
+        
+        //A condidtion was added in case the customer tried withdrawing
+        // more than they had in their account
+        
         if(withdrawel > customers.get(s.verificationOfCustomer(bankNumber)).getAccount().getCurrentBalance()) {
             throw new ArithmeticException("Insuffecient Funds!!");
         }
@@ -57,8 +67,11 @@ public class ATM implements MoneyMovement {
         this.customers = customers;
     }
 
+    // Nested class for verifying bank numbers and pins
+    
     class Security {
-
+        // Verifies which index of customers contain the client
+        // that the bank number refers to
         public int verificationOfCustomer(String bankNumber) {
             for (int i = 0; i < customers.size(); i++) {
                 if (customers.get(i).getbNumber().equals(bankNumber)) {
@@ -67,7 +80,7 @@ public class ATM implements MoneyMovement {
             }
             return -1;
         }
-
+        // Verifies pin after getting the index from verificationOfCustomer()
         public boolean validation(String bankNumber, String pinNum) {
             int index = verificationOfCustomer(bankNumber);
 
@@ -81,7 +94,7 @@ public class ATM implements MoneyMovement {
     
     @Override
     public String toString() {
-        return "NewBalance: " + newBalance;
+        return "New Balance: " + newBalance;
     }
 
 }
