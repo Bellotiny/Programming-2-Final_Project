@@ -13,7 +13,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -45,9 +44,8 @@ public class Project extends Application {
      *
      * @param primaryStage
      */
-    
     // 2 start methods for a scene change
-    
+    // and to not have too much code packed in 1 method
     @Override
     public void start(Stage primaryStage) {
         //Instantiation of accounts, customers and atm
@@ -55,7 +53,7 @@ public class Project extends Application {
         Savings account2 = new Savings(5000);
         Customer client1 = new Customer("Sen", "1223", "321", account1);
         Customer client2 = new Customer("John", "4556", "654", account2);
-        
+
         //Instantiated an ArrayList to be later used in atm's ArrayList
         ArrayList<Customer> cutomers = new ArrayList();
         cutomers.add(client1);
@@ -64,17 +62,40 @@ public class Project extends Application {
 
         primaryStage.setTitle("Welcome Customer");
 
+        GridPane beforegrid = new GridPane();
+        beforegrid.setAlignment(Pos.CENTER);
+        beforegrid.setHgap(10);
+        beforegrid.setVgap(10);
+        beforegrid.setPadding(new Insets(25, 25, 25, 25));
+        Scene beforescene = new Scene(beforegrid, 375, 325);
+        primaryStage.setScene(beforescene);
+
+        Button cheque = new Button("Chequing");
+        Button save = new Button("Savings");
+        beforegrid.add(cheque, 1, 1);
+        beforegrid.add(save, 3, 1);
+
+        Button[] btns = {cheque, save};
+
         GridPane grid = new GridPane();
+        Scene scene = new Scene(grid, 375, 325);
+
+        for (Button i : btns) {
+            i.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent e) {
+                    primaryStage.setScene(scene);
+                }
+            });
+        }
+        
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Scene scene = new Scene(grid, 375, 325);
-        primaryStage.setScene(scene);
-
         Text scenetitle = new Text("Welcome");
-        scenetitle.setFont(Font.font(client1.getName(), FontWeight.NORMAL, 20));
+        scenetitle.setFont(Font.font("Tamoha", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
         Label userName = new Label("Bank number:");
@@ -109,19 +130,20 @@ public class Project extends Application {
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                int index = atm.s.verificationOfCustomer(userTextField.getText());
+                try{
+                    int index = atm.s.verificationOfCustomer(userTextField.getText());
                 if (atm.s.validation(userTextField.getText(), pwBox.getText())) {
-                    actiontarget.setFill(Color.FIREBRICK);
-                    actiontarget.setText("Correct");
                     primaryStage.close();
                     start2(atm.getCustomers().get(index), atm);
                 } else {
                     actiontarget.setFill(Color.FIREBRICK);
-                    actiontarget.setText("Bank number not found or incorrect pin");
+                    actiontarget.setText("Incorrect pin");
                 }
+                }catch(IllegalValidation t){
+                actiontarget.setText(t.getMessage());}
             }
         });
-
+        
         primaryStage.show();
     }
 
@@ -138,12 +160,14 @@ public class Project extends Application {
         secondaryStage.setTitle("Welcome Customer");
 
         GridPane grid = new GridPane();
+        GridPane grid2 = new GridPane();
         grid.setHgap(20);
         grid.setVgap(20);
         grid.setAlignment(Pos.TOP_LEFT);
         grid.setPadding(new Insets(30, 30, 30, 30));
 
         Scene scene = new Scene(grid, 455, 500);
+        Scene scene2 = new Scene(grid2, 455, 500);
         secondaryStage.setScene(scene);
 
         Text scenetitle = new Text("Welcome " + client.getName());
@@ -154,13 +178,14 @@ public class Project extends Application {
         grid.add(balc, 5, 6);
 
         //Text displaying customer's balance
-        Text getBalance1 = new Text(client.getAccount().toString());
+        Label getBalance1 = new Label(client.getAccount().toString());
         getBalance1.setFont(Font.font("Tahoma", FontWeight.NORMAL, 14));
         grid.add(getBalance1, 5, 7);
-        
+
         //Intantiation of buttons to deposit and withdraw
         Button btnDeposit = new Button("Deposit");
         Button btnWithdraw = new Button("Withdraw");
+        Button btnFinish = new Button("Finish");
 
         TextField amount = new TextField();
         grid.add(amount, 5, 9);
@@ -173,30 +198,54 @@ public class Project extends Application {
         //Text to display how much was withdrawn or depositted
         final Text actiontarget = new Text();
         VBox vbtn = new VBox();
+        vbtn.getChildren().add(btnFinish);
         vbtn.getChildren().add(actiontarget);
         grid.add(vbtn, 5, 12);
-        
+
         /*The 2 buttons will call atm's deposit/withdraw method
         they change displayed balance to the new one
         and display the amount withdrawn or depositted*/
         btnDeposit.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                atm.deposit(client.getbNumber(), client.getPinCode(), Double.parseDouble(amount.getText()));
+                atm.deposit(client, Double.parseDouble(amount.getText()));
                 getBalance1.setText(client.getAccount().toString());
                 actiontarget.setFill(Color.FIREBRICK);
-                actiontarget.setText("You have depositted $ "+Double.parseDouble(amount.getText()));
+                actiontarget.setText("You have depositted $ " + Double.parseDouble(amount.getText()));
             }
         });
         btnWithdraw.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                atm.withdraw(client.getbNumber(), client.getPinCode(), Double.parseDouble(amount.getText()));
-                getBalance1.setText(client.getAccount().toString());
+                try{
+                    atm.withdraw(client, Double.parseDouble(amount.getText()));
+                    getBalance1.setText(client.getAccount().toString());
                 actiontarget.setFill(Color.FIREBRICK);
-                actiontarget.setText("You have withdrawn $ "+Double.parseDouble(amount.getText()));
+                actiontarget.setText("You have withdrawn $ " + Double.parseDouble(amount.getText()));
+                }catch (IllelegalAmountException t){
+                    actiontarget.setText(t.getMessage());
+                }
+                
+                /*getBalance1.setText(client.getAccount().toString());
+                actiontarget.setFill(Color.FIREBRICK);
+                actiontarget.setText("You have withdrawn $ " + Double.parseDouble(amount.getText()));*/
             }
         });
+        btnFinish.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                secondaryStage.setScene(scene2);
+            }
+        });
+        
+        grid2.setHgap(20);
+        grid2.setVgap(20);
+        grid2.setAlignment(Pos.CENTER);
+        grid2.setPadding(new Insets(30, 30, 30, 30));
+        
+        Text scenetitleFinish = new Text("Good-Bye!");
+        scenetitleFinish.setFont(Font.font("Aerial", FontWeight.NORMAL, 30));
+        grid2.add(scenetitleFinish, 0, 0);
 
         secondaryStage.show();
     }

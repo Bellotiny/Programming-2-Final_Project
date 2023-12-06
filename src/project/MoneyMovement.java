@@ -9,6 +9,6 @@ package project;
  * @author 2255525
  */
 public interface MoneyMovement {
-    public void deposit(String bNumber,String pinCode,double depositMoney);
-    public void withdraw(String bNumber,String pinCode,double withdrawel);
+    public void deposit(Customer customer,double depositMoney);
+    public void withdraw(Customer customer,double withdrawel) throws IllelegalAmountException;
 }

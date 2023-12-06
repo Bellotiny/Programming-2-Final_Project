@@ -8,7 +8,7 @@ package project;
  *
  * @author 2255525
  */
-public class Account{
+public abstract class Account{
     private double currentBalance;
 
     public Account(double currentBalance) {

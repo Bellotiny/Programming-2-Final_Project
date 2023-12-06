@@ -4,7 +4,6 @@
  */
 package project;
 
-import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,11 +13,11 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author 2255525
+ * @author musit
  */
-public class AccountTest extends TestCase{
+public class CustomerTest {
     
-    public AccountTest() {
+    public CustomerTest() {
     }
     
     @BeforeClass
@@ -38,14 +37,15 @@ public class AccountTest extends TestCase{
     }
 
     /**
-     * Test of toString method, of class Account.
+     * Test of getName method, of class Customer.
      */
     @Test
-    public void testToString() {
-        System.out.println("toString");
-        Account instance = new Account(100);
-        String expResult = String.format("$ %.2f", 100.0);
-        String result = instance.toString();
+    public void testGetName() {
+        System.out.println("getName");
+        Chequing c1 = new Chequing(100);
+        Customer instance = new Customer("Johnny","123","123",c1);
+        String expResult = "Johnny";
+        String result = instance.getName();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");

@@ -36,25 +36,24 @@ public class ATM implements MoneyMovement {
        then the an amount is added or subtracted from it
        The customer's balance is then set to the amount found in newBalance*/
     
-    public void deposit(String bankNumber, String pin, double depositMoney) {
-        newBalance = customers.get(s.verificationOfCustomer(bankNumber)).getAccount().getCurrentBalance();
+    public void deposit(Customer customer, double depositMoney) {
+        newBalance = customer.getAccount().getCurrentBalance();
         newBalance += depositMoney;
-        customers.get(s.verificationOfCustomer(bankNumber)).getAccount().setCurrentBalance(newBalance);
+        customer.getAccount().setCurrentBalance(newBalance);
     }
 
-    public void withdraw(String bankNumber, String pin, double withdrawel) {
-        
-        newBalance = customers.get(s.verificationOfCustomer(bankNumber)).getAccount().getCurrentBalance();
+    public void withdraw(Customer customer, double withdrawel) throws IllelegalAmountException{
+        newBalance = customer.getAccount().getCurrentBalance();
         
         //A condidtion was added in case the customer tried withdrawing
         // more than they had in their account
         
-        if(withdrawel > customers.get(s.verificationOfCustomer(bankNumber)).getAccount().getCurrentBalance()) {
-            throw new ArithmeticException("Insuffecient Funds!!");
+        if(withdrawel > customer.getAccount().getCurrentBalance()) {
+            throw new IllelegalAmountException("Insuffecient Funds!!!!");
         }
         else{
         newBalance -= withdrawel;
-        customers.get(s.verificationOfCustomer(bankNumber)).getAccount().setCurrentBalance(newBalance);
+        customer.getAccount().setCurrentBalance(newBalance);
         }
         
     }
@@ -72,16 +71,18 @@ public class ATM implements MoneyMovement {
     class Security {
         // Verifies which index of customers contain the client
         // that the bank number refers to
-        public int verificationOfCustomer(String bankNumber) {
+        public int verificationOfCustomer(String bankNumber) throws IllegalValidation{
             for (int i = 0; i < customers.size(); i++) {
                 if (customers.get(i).getbNumber().equals(bankNumber)) {
                     return i;
+                }else if(i == customers.size()-1){
+                    throw new IllegalValidation("This bank number can't be found!");
                 }
             }
             return -1;
         }
         // Verifies pin after getting the index from verificationOfCustomer()
-        public boolean validation(String bankNumber, String pinNum) {
+        public boolean validation(String bankNumber, String pinNum) throws IllegalValidation{
             int index = verificationOfCustomer(bankNumber);
 
             if (pinNum.equals(customers.get(index).getPinCode())) {

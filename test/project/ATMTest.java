@@ -52,7 +52,7 @@ public class ATMTest extends TestCase{
         String pin = "123";
         double depositMoney = 10.0;
         ATM instance = new ATM(customers);
-        instance.deposit(bankNumber, pin, depositMoney);
+        instance.deposit(client1, depositMoney);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
     }
